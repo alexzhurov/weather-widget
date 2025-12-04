@@ -1,147 +1,188 @@
 <template>
-  <div class="widget">
-    <div class="location">Moscow, RU</div>
-
-    <div class="weather-main">
-      <div class="icon">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-        >
-          <path
-            d="M3 15a4 4 0 0 0 4 4h10a5 5 0 0 0 0-10 6 6 0 0 0-11-2A4 4 0 0 0 3 15z"
-          />
-        </svg>
-      </div>
-      <div class="temperature">10°C</div>
-    </div>
-
-    <div class="description">Feels like 5°C. Broken clouds. Light breeze</div>
-
-    <div class="details">
-      <div class="row">
-        <div class="half">
-          <font-awesome-icon icon="location-arrow" rotation="270" />
-          <span> 3.0 m/s SSE</span>
+  <div v-if="weatherStore.loading">Loading...</div>
+  <div v-else>
+    <div v-for="item in cityWeatherList" :key="item.city.id" class="widget">
+      <template v-if="item.weather">
+        <div class="location">
+          <span>
+            {{ item.city.name
+            }}{{ item.weather.sys.country && `, ${item.weather.sys.country}` }}
+          </span>
         </div>
-        <div class="half">
-          <font-awesome-icon icon="compass" />
-          <span>1021 hPa</span>
+
+        <div class="weather-main" v-if="item.weather">
+          <div class="icon">
+            <img :src="getIcon(item.city.id)" :alt="item.mainWeather.main" />
+          </div>
+          <div class="temperature">
+            {{ floorCelc(item.weather.main.temp) }}°C
+          </div>
         </div>
-      </div>
 
-      <div class="row">
-        <div class="half">Humidity: 97%</div>
-        <div class="half">Dew point: 0°C</div>
-      </div>
+        <div class="description" v-if="item.mainWeather">
+          Feels like {{ floorCelc(item.weather.main.feels_like) }}°C.
+          {{ capitalizeFirstLetter(item.mainWeather.description) }}
+        </div>
+        <div class="details" v-if="item.weather">
+          <div class="row">
+            <div class="half">
+              <font-awesome-icon icon="location-arrow" rotation="270" />
+              <span>
+                {{ item.weather.wind.speed }} m/s
+                {{ getWindDirection(item.weather.wind.deg) }}
+              </span>
+            </div>
+            <div class="half">
+              <font-awesome-icon icon="compass" />
+              <span>{{ item.weather.main.pressure }} hPa</span>
+            </div>
+          </div>
 
-      <div class="row">
-        <div>Visibility: 10.0 km</div>
-      </div>
+          <div class="row">
+            <div class="half">Humidity: {{ item.weather.main.humidity }}%</div>
+            <div class="half">
+              Dew point:
+              {{
+                getDewPoint(item.weather.main.temp, item.weather.main.humidity)
+              }}°C
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              Visibility: {{ (item.weather.visibility / 1000).toFixed(1) }} km
+            </div>
+          </div>
+        </div>
+      </template>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from "vue";
-import { fetchWeather } from "../services/weatherApi";
+<script setup lang="ts">
+import { watch, computed, onMounted, onBeforeUnmount } from "vue";
+import { useCitiesStore } from "@/stores/useCitiesStore";
+import { useWeatherStore } from "@/stores/useWeatherStore";
 
-export default defineComponent({
-  name: "WeatherWidget",
+const citiesStore = useCitiesStore();
+const weatherStore = useWeatherStore();
 
-  setup() {
-    const city = ref("");
-    const weather = ref<any>(null);
-    const loading = ref(false);
-    const error = ref("");
+const updateWeather = () => {
+  if (citiesStore.cities.length) {
+    weatherStore.fetchAll(citiesStore.cities);
+  } else {
+    citiesStore.initWithGeo();
+  }
+};
 
-    const loadWeather = async () => {
-      if (!city.value) {
-        error.value = "Enter a city name";
-        return;
-      }
-      loading.value = true;
-      error.value = "";
+let stopWatch: () => void | null = null;
 
-      try {
-        weather.value = await fetchWeather(city.value);
-      } catch (e) {
-        error.value = "Failed to load weather";
-      }
-
-      loading.value = false;
-    };
-
-    return { city, weather, loading, error, loadWeather };
-  },
+onMounted(() => {
+  updateWeather();
+  stopWatch = watch(() => citiesStore.cities, updateWeather, { deep: true });
 });
+
+const cityWeatherList = computed(() =>
+  citiesStore.cities.map((city) => {
+    const weather = weatherStore.weathers[city.id];
+    return {
+      city,
+      weather,
+      mainWeather: weather?.weather[0],
+    };
+  })
+);
+
+onBeforeUnmount(() => {
+  stopWatch && stopWatch();
+});
+
+const getIcon = (id: number) => {
+  const weather = weatherStore.weathers[id];
+  return weather
+    ? `https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`
+    : "";
+};
+
+const getWindDirection = (deg: number) => {
+  const dirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
+  return dirs[Math.round(deg / 45) % 8];
+};
+
+const getDewPoint = (temp: number, humidity: number) => {
+  return floorCelc(+(temp - (100 - humidity) / 5).toFixed(1));
+};
+const floorCelc = (temperature: number) => {
+  return Math.floor(temperature);
+};
+
+const capitalizeFirstLetter = (s: string) =>
+  s.charAt(0).toUpperCase() + s.slice(1);
 </script>
 
 <style lang="scss">
 .widget {
-  width: 16rem; // ~ w-64
-  padding: 1rem; // ~ p-4
-  background: #fff; // bg-white
-  color: #4a5568; // gray-700
-  border-radius: 1rem; // rounded-2xl
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); // shadow
-  user-select: none; // select-none
+  padding: 1rem;
+  background: #fff;
+  color: #4a5568;
+  border-radius: 1rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  user-select: none;
   font-family: sans-serif;
 
   .location {
-    font-size: 0.875rem; // text-sm
-    font-weight: 700; // font-medium
+    font-size: 0.875rem;
+    font-weight: 700;
   }
 
   .weather-main {
-    display: flex; // flex
-    align-items: center; // items-center
-    margin-top: 0.5rem; // mt-2
+    display: flex;
+    align-items: center;
+    margin-top: 0.5rem;
 
     .icon {
-      flex: 1; // basis-1/2
+      flex: 1;
       display: flex;
       justify-content: flex-end;
-      font-size: 3rem; // text-5xl
-      font-weight: 600; // font-semibold
-      color: #d6bcfa; // text-purple-200
+      font-size: 3rem;
+      font-weight: 600;
+      color: #d6bcfa;
       svg {
-        width: 2.5rem; // w-10
-        height: 2.5rem; // h-10
+        width: 2.5rem;
+        height: 2.5rem;
       }
     }
 
     .temperature {
-      flex: 1; // basis-1/2
-      margin-left: 0.5rem; // ml-2
-      font-size: 1.125rem; // text-lg
-      font-weight: 700; // font-bold
+      flex: 1;
+      margin-left: 0.5rem;
+      font-size: 1.125rem;
+      font-weight: 700;
     }
   }
 
   .description {
-    margin-top: 0.25rem; // mt-1
-    font-size: 0.875rem; // text-sm
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
   }
 
   .details {
-    margin-top: 1rem; // mt-4
-    font-size: 0.875rem; // text-sm
+    margin-top: 1rem;
+    font-size: 0.875rem;
     text-align: left;
 
     .row {
       display: flex;
-      margin-bottom: 0.25rem; // space-y-1
+      margin-bottom: 0.25rem;
 
       .half {
-        flex: 1; // basis-1/2
+        flex: 1;
         display: flex;
         align-items: center;
       }
 
       .half + .half {
-        margin-left: 0.25rem; // gap
+        margin-left: 0.25rem;
       }
     }
   }
