@@ -1,11 +1,22 @@
 # 🌦 Weather Widget (Vue.js + Web Components)
 
-Лёгкий независимый виджет погоды, который можно вставить **на любой сайт** одной строкой:
+A lightweight, standalone weather widget that can be embedded **on any website** in one line:
 
 ```html
-<weather-widget></weather-widget>
+<weather-widget />
 <script src="https://yourcdn.com/weather-widget.js"></script>
 ```
+
+## Technologies Used
+
+- Vue.js 3 + Composition API
+- TypeScript
+- Pinia for state management
+- Axios for API requests
+- SCSS for styling
+- Web Components build via Vue CLI
+API
+- Data fetched from [OpenWeather API](https://openweathermap.org/api)
 
 ## Project setup
 ```
