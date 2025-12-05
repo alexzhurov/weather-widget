@@ -19,22 +19,25 @@ API
 - Data fetched from [OpenWeather API](https://openweathermap.org/api)
 
 ## Project setup
-```
+
+```bash
 yarn install
 ```
 
 ### Compiles and hot-reloads for development
-```
+
+```bash
 yarn serve
 ```
 
 ### Compiles Web component
-```
+
+```bash
 yarn build:widget
 ```
 
 ### Lints and fixes files
-```
+
+```bash
 yarn lint
 ```
-
