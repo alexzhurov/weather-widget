@@ -3,8 +3,8 @@
 A lightweight, standalone weather widget that can be embedded **on any website** in one line:
 
 ```html
-<weather-widget />
-<script src="https://yourcdn.com/weather-widget.js"></script>
+<weather-widget></weather-widget>
+<script type="module" src="dist/weather-widget.js"></script>
 ```
 
 ## Technologies Used
@@ -20,24 +20,19 @@ API
 
 ## Project setup
 
+Install dependencies:
 ```bash
 yarn install
 ```
 
-### Compiles and hot-reloads for development
+### Build the widget
 
+Build the Web Component for production:
 ```bash
-yarn serve
+yarn build
 ```
 
-### Compiles Web component
-
+Build and watch for changes
 ```bash
-yarn build:widget
-```
-
-### Lints and fixes files
-
-```bash
-yarn lint
+yarn build:watch
 ```
