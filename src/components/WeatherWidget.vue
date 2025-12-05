@@ -12,7 +12,11 @@
 
         <div class="weather-main" v-if="item.weather">
           <div class="icon">
-            <img :src="getIcon(item.city.id)" :alt="item.mainWeather.main" />
+            <img
+              v-if="item.mainWeather"
+              :src="getIcon(item.city.id)"
+              :alt="item.mainWeather?.main"
+            />
           </div>
           <div class="temperature">
             {{ floorCelc(item.weather.main.temp) }}°C
@@ -75,7 +79,7 @@ const updateWeather = () => {
   }
 };
 
-let stopWatch: () => void | null = null;
+let stopWatch: (() => void) | null = null;
 
 onMounted(() => {
   updateWeather();
