@@ -72,18 +72,15 @@ export const useCitiesStore = defineStore("cities", {
       const { latitude, longitude } = coords.coords;
 
       try {
-        const resp = await axios.get(
-          `https://api.openweathermap.org/data/2.5/weather`,
-          {
-            params: {
-              lat: latitude,
-              lon: longitude,
-              units: "metric",
-              lang: "en",
-              appid: API_KEY,
-            },
-          }
-        );
+        const resp = await axios.get(WEATHER_BASE_URL, {
+          params: {
+            lat: latitude,
+            lon: longitude,
+            units: "metric",
+            lang: "en",
+            appid: API_KEY,
+          },
+        });
 
         const data = resp.data;
         const city = { id: data.id, name: data.name };
