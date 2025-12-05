@@ -67,6 +67,7 @@
 import { watch, computed, onMounted, onBeforeUnmount } from "vue";
 import { useCitiesStore } from "@/stores/useCitiesStore";
 import { useWeatherStore } from "@/stores/useWeatherStore";
+import { FontAwesomeIcon } from "@/plugins/fontawesome";
 
 const citiesStore = useCitiesStore();
 const weatherStore = useWeatherStore();
@@ -92,7 +93,7 @@ const cityWeatherList = computed(() =>
     return {
       city,
       weather,
-      mainWeather: weather?.weather[0],
+      mainWeather: weather?.weather[0] ?? null,
     };
   })
 );
