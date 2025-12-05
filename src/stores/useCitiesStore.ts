@@ -1,24 +1,19 @@
-// src/stores/useCitiesStore.ts
 import { defineStore } from "pinia";
 import axios from "axios";
 import { API_KEY, WEATHER_BASE_URL } from "@/config/weather";
 
 export const useCitiesStore = defineStore("cities", {
   state: () => ({
-    cities: [] as { id: number; name: string }[],
+    cities: JSON.parse(localStorage.getItem("weather-cities") || "[]") as {
+      id: number;
+      name: string;
+    }[],
     newCity: "",
     storageKey: "weather-cities",
     error: null as string | null,
   }),
 
   actions: {
-    loadFromLocalStorage() {
-      const saved = localStorage.getItem(this.storageKey);
-      if (saved) {
-        this.cities = JSON.parse(saved);
-      }
-    },
-
     saveToLocalStorage() {
       localStorage.setItem(this.storageKey, JSON.stringify(this.cities));
     },
@@ -91,10 +86,12 @@ export const useCitiesStore = defineStore("cities", {
         );
 
         const data = resp.data;
-
         const city = { id: data.id, name: data.name };
-        this.cities.push(city);
-        this.saveToLocalStorage();
+
+        if (!this.cities.find((c) => c.id === city.id)) {
+          this.cities.push(city);
+          this.saveToLocalStorage();
+        }
       } catch (e) {
         console.error("Unable to determine the city by geolocation", e);
       }
