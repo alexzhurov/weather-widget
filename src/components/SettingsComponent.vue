@@ -35,7 +35,7 @@
 
         <font-awesome-icon
           icon="arrow-turn-down"
-          rotation="90"
+          :rotation="90"
           class="add-btn"
           @click="addCity"
         />
@@ -48,28 +48,16 @@
   </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import draggable from "vuedraggable";
-import { defineComponent } from "vue";
 import { useCitiesStore } from "@/stores/useCitiesStore";
 import { storeToRefs } from "pinia";
+import { FontAwesomeIcon } from "@/plugins/fontawesome";
 
-export default defineComponent({
-  name: "SettingsComponent",
-  components: { draggable },
+const store = useCitiesStore();
+const { cities, newCity, error } = storeToRefs(store);
 
-  setup() {
-    const store = useCitiesStore();
-    const { cities, newCity, error } = storeToRefs(store);
-
-    return {
-      cities,
-      newCity,
-      error,
-      addCity: store.addCity,
-      removeCity: store.removeCity,
-      save: store.saveToLocalStorage,
-    };
-  },
-});
+const addCity = store.addCity;
+const removeCity = store.removeCity;
+const save = store.saveToLocalStorage;
 </script>
