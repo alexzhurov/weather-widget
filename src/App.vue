@@ -13,8 +13,12 @@
 
 <script lang="ts" setup>
 import { ref } from "vue";
+import { createPinia, setActivePinia } from "pinia";
 import WeatherWidget from "@/components/WeatherWidget.vue";
 import SettingsComponent from "@/components/SettingsComponent.vue";
+import { FontAwesomeIcon } from "@/plugins/fontawesome";
+
+setActivePinia(createPinia());
 
 const showSettings = ref(false);
 
@@ -22,4 +26,3 @@ function toggleView() {
   showSettings.value = !showSettings.value;
 }
 </script>
-
