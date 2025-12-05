@@ -34,7 +34,7 @@ export const useCitiesStore = defineStore("cities", {
           params: { q: name, units: "metric", lang: "en", appid: API_KEY },
         });
 
-        if (data.cod && data.cod !== 200) {
+        if (data.cod && Number(data.cod) !== 200) {
           throw new Error(data.message || "City not found");
         }
 
