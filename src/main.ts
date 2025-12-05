@@ -1,16 +1,12 @@
-// main.ts
-import { createApp } from "vue";
+import { defineWidget } from "@/utils/defineWidget";
 import App from "@/App.vue";
-import { createPinia } from "pinia";
-import { FontAwesomeIcon } from "@/plugins/fontawesome";
-import { useCitiesStore } from "@/stores/useCitiesStore";
+import AppStyles from "@/App.scss?raw";
+import WeatherWidgetStyles from "@/components/WeatherWidget.scss?raw";
+import SettingsComponentStyles from "@/components/SettingsComponent.scss?raw";
 
-const app = createApp(App);
-
-app.component("font-awesome-icon", FontAwesomeIcon);
-const pinia = createPinia();
-app.use(pinia);
-
-const citiesStore = useCitiesStore();
-citiesStore.loadFromLocalStorage();
-app.mount("#app");
+// Повторите для каждого компонента
+defineWidget({
+  tag: "weather-widget",
+  component: App,
+  styles: [AppStyles, WeatherWidgetStyles, SettingsComponentStyles],
+});
