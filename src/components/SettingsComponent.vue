@@ -4,7 +4,7 @@
 
     <!-- DRAGGABLE LIST -->
     <draggable v-model="cities" handle=".drag-handle" item-key="id" @end="save">
-      <template #item="{ element }">
+      <template #item="{ element }: { element: { id: number, name: string } }">
         <div class="city-item">
           <font-awesome-icon icon="bars" class="drag-handle" />
 
