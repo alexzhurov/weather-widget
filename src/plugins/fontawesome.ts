@@ -1,5 +1,7 @@
-import { library } from "@fortawesome/fontawesome-svg-core";
+import { config, library, dom } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+
+config.autoAddCss = false;
 
 import {
   // faTrash,
@@ -12,7 +14,6 @@ import {
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 
-// Add the imported icons to the library
 library.add(
   // faTrash,
   faGear,
@@ -24,5 +25,7 @@ library.add(
   faArrowTurnDown,
   faXmark
 );
+
+export const FAStyles = dom.css();
 
 export { FontAwesomeIcon };

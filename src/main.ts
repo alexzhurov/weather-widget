@@ -3,10 +3,10 @@ import App from "@/App.vue";
 import AppStyles from "@/App.scss?raw";
 import WeatherWidgetStyles from "@/components/WeatherWidget.scss?raw";
 import SettingsComponentStyles from "@/components/SettingsComponent.scss?raw";
+import { FAStyles } from "@/plugins/fontawesome";
 
-// Повторите для каждого компонента
 defineWidget({
   tag: "weather-widget",
   component: App,
-  styles: [AppStyles, WeatherWidgetStyles, SettingsComponentStyles],
+  styles: [FAStyles, AppStyles, WeatherWidgetStyles, SettingsComponentStyles],
 });
